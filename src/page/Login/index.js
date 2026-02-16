@@ -8,8 +8,8 @@ import { useState } from 'react';
 export default function Login() {
   const navigation = useNavigation();
 
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
+  const [email, setEmail] = useState(null);
+  const [senha, setSenha] = useState(null);
   const [aviso, setAviso] = useState(false);
     
 
@@ -27,13 +27,13 @@ export default function Login() {
   return (
     <View style={styles.container}>
       <View style={styles.containerEnt}>
-        <Animatable.Image animation={"bounceIn"} duration={3000} source={require("./icon/picpay.png")}
+        <Animatable.Image animation={"bounceIn"} duration={3000} source={require("./icon/picpay_com_fundo.png")}
             style={styles.ima}>
         </Animatable.Image>
       </View>
       <View style={styles.contInputs}>
-        {/* <Text style={styles.titulo}>Acesse sua conta!</Text> */}
         <View style={styles.contInput}>
+          <Text style={styles.titulo}>Bem vindo de volta!</Text>
           <TextInput 
               style={styles.itens}
               placeholder='Email'
@@ -42,7 +42,7 @@ export default function Login() {
           />
           <TextInput 
               style={styles.itens}
-              placeholder='Senha '
+              placeholder='Senha'
               keyboardType='numeric'
               value={senha}
               onChangeText={setSenha}
@@ -51,7 +51,7 @@ export default function Login() {
       
         <View style={styles.contButton}>
           <Pressable
-            onPress={() => navigation.navigate('home')}
+            onPress={() => navigation.replace('Cadastro')}
             style={styles.menu}> 
             <Text>Entrar</Text>
           </Pressable>

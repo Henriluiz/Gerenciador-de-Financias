@@ -23,7 +23,7 @@ export default function Splash() {
 
   return (
     <View style={styles.container}>
-        <Animatable.Image animation={"bounceIn"} duration={3000} source={require("./icon/picpay.png")}
+        <Animatable.Image animation={"bounceIn"} duration={3000} source={require("./icon/picpay_com_fundo.png")}
             style={styles.ima}>
         </Animatable.Image>
       <StatusBar style="auto" />
