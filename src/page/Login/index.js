@@ -22,7 +22,8 @@ export default function Login() {
         setAviso(true)
         return;
       } else {
-          navigation.navigate('Menu')
+          const logado = true
+          navigation.navigate('Menu', {logado})
       }
   };
 

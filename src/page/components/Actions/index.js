@@ -10,7 +10,8 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 import AntDesign from '@expo/vector-icons/AntDesign';
 
-export default function Actions({ onOpenModalCompra, onOpenModalGanho, onClearList , onClearUltList}) {
+export default function Actions({ onOpenModalCompra, onOpenModalGanho,
+    onClearList , onClearUltList, reloadUp}) {
     
 
 
@@ -51,11 +52,11 @@ export default function Actions({ onOpenModalCompra, onOpenModalGanho, onClearLi
             <Text style={styles.labelButton}>Pix</Text>
         </Pressable>
 
-        <Pressable style={styles.actionButton}>
+        <Pressable style={styles.actionButton} onPress={() => reloadUp()}>
             <View style={styles.areaButton}>
-                <AntDesign name="setting" size={24} color="black" />
+                <AntDesign name="reload" size={24} color="black" />
             </View>
-            <Text style={styles.labelButton}>Conta</Text>
+            <Text style={styles.labelButton}>Carregar</Text>
         </Pressable>
         
         <Pressable style={styles.actionButton} onPress={() => onClearList()}>
@@ -70,6 +71,13 @@ export default function Actions({ onOpenModalCompra, onOpenModalGanho, onClearLi
                 <MaterialIcons name="delete-outline" size={24} color="black" />
             </View>
             <Text style={styles.labelButton}>Útlimo</Text>
+        </Pressable>
+
+        <Pressable style={styles.actionButton}>
+            <View style={styles.areaButton}>
+                <AntDesign name="setting" size={24} color="black" />
+            </View>
+            <Text style={styles.labelButton}>Conta</Text>
         </Pressable>
     </ScrollView>
   );

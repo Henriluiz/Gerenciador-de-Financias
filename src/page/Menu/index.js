@@ -18,7 +18,7 @@ import { ActivityIndicator } from 'react-native-web';
 // <MaterialIcons name="attach-money" size={24} color="black" /> ganhei money
 // <MaterialIcons name="money-off" size={24} color="black" /> Perdi money
 
-export default function Menu() {
+export default function Menu( {logar} ) {
   const navigation = useNavigation();
   const [posicaoModal, setPosicaoModal] = useState(false);
   const [list, setList] = useState([
@@ -33,7 +33,7 @@ export default function Menu() {
   const [compra, setCompra] = useState(true);
   const [saldo, setSaldo] = useState(0);
   
-  
+  const [logan, setLogan] = useState(logar)
 
   const KEY_LIST = "@transacoes";
   const KEY_SALDO = "@saldo";
@@ -250,6 +250,7 @@ export default function Menu() {
           onOpenModalGanho={() => (setPosicaoModal(true), setCompra(false), setType(1))}
           onClearList = {() => (setList([]), setSaldo(0))}
           onClearUltList = {() => delUltTrans()}
+          reloadUp = {() => carregarTudo()}
         />
         <Modal transparent={true} visible={posicaoModal}>
           <KeyboardAwareScrollView
