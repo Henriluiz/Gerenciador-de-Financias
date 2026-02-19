@@ -5,27 +5,36 @@ import styles from './styles';
 import { useNavigation } from '@react-navigation/native';
 import { useState } from 'react';
 
-export default function Login() {
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import Header from '../components/Header';
+
+export default function Cadastro() {
   const navigation = useNavigation();
 
-  const [nome, setNome] = useState(null)
+  const [nome, setNome] = useState(null);
   const [email, setEmail] = useState(null);
   const [senha, setSenha] = useState(null);
   const [aviso, setAviso] = useState(false);
     
 
   const validarCampos = () => {
-      if (!email.trim() || !senha.trim()) {
+      if (!nome || !email || !senha) {
           setAviso(true)
       return;
       } else {
-          navigation.navigate('Splash')
+        navigation.navigate("Menu", { nome });
       }
   };
 
-
-
   return (
+    <KeyboardAwareScrollView
+        style={{ flex: 0.5 }}
+        contentContainerStyle={{ flexGrow: 1 }}
+        enableOnAndroid={true}
+        extraScrollHeight={30}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
     <View style={styles.container}>
       <View style={styles.containerEnt}>
         <Animatable.Image animation={"bounceIn"} duration={3000} source={require("./icon/picpay_com_fundo.png")}
@@ -51,15 +60,25 @@ export default function Login() {
           <TextInput 
               style={styles.itens}
               placeholder='Senha'
-              keyboardType='numeric'
+              keyboardType='default'
               value={senha}
               onChangeText={setSenha}
           />
         </View>
-      
+        {aviso && Alert.alert(
+          "Acesso Negado",
+          "Preencha o email e senha",
+          [
+            {
+              text: "Fechar",
+              onPress: () => {
+                setAviso(false);
+              }
+            }
+          ])}
         <View style={styles.contButton}>
           <Pressable
-            onPress={() => navigation.replace('Cadastro')}
+            onPress={() => validarCampos()}
             style={styles.menu}> 
             <Text>Entrar</Text>
           </Pressable>
@@ -73,5 +92,7 @@ export default function Login() {
         <StatusBar style="auto" />
       </View>
     </View>
+    </KeyboardAwareScrollView>
   );
+  
 }

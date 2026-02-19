@@ -20,10 +20,19 @@
         "foregroundImage": "./assets/picpay.png",
         "backgroundColor": "#21C25E"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.luizhpzin.financie"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "00de6d90-c545-482f-a1fa-828a21b35829"
+      }
+    },
+    "plugins": [
+      "expo-secure-store"
+    ]
   }
 }

@@ -6,6 +6,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Splash from "./src/page/Splash";
 import Login from "./src/page/Login";
 import Cadastro from "./src/page/Cadastro";
+import Menu from "./src/page/Menu"
 
 const Stack = createNativeStackNavigator();
 
@@ -18,20 +19,20 @@ export default function App() {
           name="Splash"
           component={Splash}
           options={{
-            headerTransparent: true,
-            headerTitle: '',
+            headerShown: false,
           }}
         />
         <Stack.Screen name="Login" component={Login}   options={{
-            headerTransparent: true,
-            headerTitle: '',
+            headerShown: false,
           }}
         />
         <Stack.Screen name="Cadastro" component={Cadastro}   options={{
-            headerTransparent: true,
-            headerTitle: '',
+            headerShown: false,
           }}
         />
+        <Stack.Screen name="Menu" component={Menu} options={{
+          headerShown: false,
+        }}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
