@@ -54,53 +54,73 @@ export default function Header( {saldo, closeProfile} ) {
             </Pressable>
         </View>
         <View style={styles.content}>
-            <View style={styles.itens}>
-                <Text style={{color: "#FFF", fontSize: 15, textAlign: "center"}}>
-                    Saldo Picpay
-                </Text>
-                  <Pressable onPress={() => setVisivel(v => !v)} style={{flexDirection: "row", gap: 5, alignItems: "center"}} >
-                    <Text style={{color: "#FFF", fontSize: 25, textAlign: "center"}}>
-                        {visivel ? formatar(saldo) : <Text>R$ •••••</Text>}
-                    </Text>
-                    <AntDesign name={visivel ? "eye" : "eye-invisible"} size={24} color="#FFF" />
-                  </Pressable>
+            <View style={styles.contentSaldo}>
+              <View style={styles.itens}>
+                  <Text style={{color: "#FFF", fontSize: 18}}>
+                    Saldo em conta
+                  </Text>
+                    <Pressable onPress={() => setVisivel(v => !v)} style={{flexDirection: "row", gap: 5, alignItems: "center"}} >
+                      <Text style={{color: "#FFF", fontSize: 25, textAlign: "center", fontWeight: "bold"}}>
+                          {visivel ? formatar(saldo) : <Text>R$ •••••</Text>}
+                      </Text>
+                    </Pressable>
               </View>
-          </View>
-      </View>
+              <AntDesign name={visivel ? "eye-invisible" : "eye"} size={24} color="#FFF" />
+            </View>
+            <Pressable
+              style={styles.botton}> 
+              <Text>Guardar</Text>
+            </Pressable>
+        </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#21C25E",
-    paddingTop: statusBarHeight,
-    height: 150,
+    backgroundColor: "#1F8F78",
+    paddingTop: statusBarHeight, // Isso fará o padding de acordo com o tamanho do StatusBar
     justifyContent: "flex-end",
     alignItems: "center",
   },
 
   Contheader: {
-    width: "100%",
-    backgroundColor: "#21C25E",
-    paddingInline: "5%",
+    width: wp("90%"),
+    backgroundColor: "#1F8F78",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    
+    marginBottom: hp("4%"),
   },
 
   content: {
+    flexDirection: "column",
+    backgroundColor: "#177261",
+    width: wp("80%"),
+    height: hp("17%"),
+    padding: wp("5%"),
+    borderRadius: 25,
+  },
+
+  contentSaldo: {
     flexDirection: "row",
-    justifyContent: "flex-start",
-    backgroundColor: "black",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 
   itens: {
     paddingTop: 5,
     paddingBottom: 20,
-    backgroundColor: "#21C25E",
   },
 
+  botton: {
+    width: wp("70%"),
+    backgroundColor: "#FFF",
+    textAlign: "center",
+    alignItems: "center",
+    borderRadius: 15,
+    paddingVertical: hp("1%")
+  },
 
   text: {
     color: "#FFF",

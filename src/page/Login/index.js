@@ -18,7 +18,7 @@ export default function Login() {
       if (!email || !senha) {
           setAviso(true)
       return;
-      } else if (email != "luiz@gmail.com" || senha != "Luiz2145@#"){
+      } else if (email != "luiz" || senha != "2145"){
         setAviso(true)
         return;
       } else {
