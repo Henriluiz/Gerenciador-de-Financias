@@ -15,11 +15,12 @@ export default StyleSheet.create({
   titulo: {
     fontSize: 18,
     fontWeight: "bold",
-    margin: 5,
+    marginTop: 2,
+    marginBottom: 10,
   },
 
   tituloModal: {
-    fontSize: 18,
+    fontSize: 23,
     fontWeight: "bold",
     margin: 10,
     color: "#fff"
@@ -51,8 +52,8 @@ export default StyleSheet.create({
   itensInput: {
     width: 200,
     borderStyle: "solid",
-    borderWidth: 1.5,
-    borderRadius: 10,
+    borderBottomWidth: 1.5,
+    // borderRadius: 10,
     borderColor: "#fff",
   },
 

@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { Text, View, Pressable, Modal, Platform , TextInput, Alert, FlatList} from 'react-native';
+import { Text, View, Pressable, Modal, Platform , TextInput, Alert, FlatList, TurboModuleRegistry} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import styles from './styles';
 import { useNavigation } from '@react-navigation/native';
@@ -30,6 +30,7 @@ export default function Menu( {logar} ) {
   const [type, setType] = useState('');
   const [agree, setAgree] = useState(false);
   const [aprovadoCompra, setAprovadoCompra] = useState(true);
+  const [aprovadoCompraData,setAprovadoCompraData] = useState(true)
   const [compra, setCompra] = useState(true);
   const [saldo, setSaldo] = useState(0);
   
@@ -50,11 +51,13 @@ export default function Menu( {logar} ) {
     const items = await AsyncStorage.multiGet([KEY_LIST, KEY_SALDO]);
     const map = Object.fromEntries(items);
 
-    const list = map[KEY_LIST] ? JSON.parse(map[KEY_LIST]) : [];
-    const saldo = map[KEY_SALDO] ? JSON.parse(map[KEY_SALDO]) : 0;
+    const lista_atl = map[KEY_LIST] ? JSON.parse(map[KEY_LIST]) : [];
+    const saldo_atl = map[KEY_SALDO] ? JSON.parse(map[KEY_SALDO]) : 0;
 
-    setList(list);
-    setSaldo(saldo);
+    setList(lista_atl);
+    setSaldo(saldo_atl);
+
+    console.log(list, saldo)
   }
 
   function addItem() {
@@ -67,51 +70,13 @@ export default function Menu( {logar} ) {
     year: 'numeric',
   }).format(new Date());
 
-  function validarDataBR(texto) {
-    if (!texto) return false;
-
-    // DD/MMM/AAAA
-    const regex = /^(\d{2})\/([A-Za-zçÇ]{3})\/(\d{4})$/;
-    const match = texto.match(regex);
-    if (!match) return false;
-
-    let [, dia, mesTxt, ano] = match;
-
-    dia = Number(dia);
-    ano = Number(ano);
-
-    const meses = {
-        jan: 0, fev: 1, mar: 2, abr: 3, mai: 4, jun: 5,
-        jul: 6, ago: 7, set: 8, out: 9, nov: 10, dez: 11
-    };
-
-    const mes = meses[mesTxt.toLowerCase()];
-    if (mes === undefined) return false;
-
-    // cria data real
-    const data = new Date(ano, mes, dia);
-
-    // valida se o JS não "corrigiu" a data
-    return (
-        data.getFullYear() === ano &&
-        data.getMonth() === mes &&
-        data.getDate() === dia
-    );
-  }
-
-
-  function formatar(valor) {
-    return valor.toLocaleString("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-    });
-  }
 
   function maskValorBRL(text, tipoTrans) { // se tipoTrans for 1 é compra, se for 0 é ganho
     const digits = String(text ?? "").replace(/\D/g, "");
     const number = digits ? Number(digits) / 100 : 0;
 
-    if (tipoTrans == 1 && number > Number(saldo ?? 0)) {
+    if (tipoTrans == 1 && number > Number(saldo ?? 0)) { // Verificar se a transferência for
+    //  uma compra, ele verificar que o valor da compra é infeior ou maior. Se for em inferior, aprova!
       setAprovadoCompra(false);
     } else {
       setAprovadoCompra(true);
@@ -144,18 +109,30 @@ export default function Menu( {logar} ) {
     if (!aprovadoCompra) {
       return;
     }
-
-    if (!name.trim() || !value.trim() || !date.trim()) {
-        alert('Preencha todos os campos!');
-        return;
+    try {
+      if (!name.trim() || !value.trim() || !date.trim()) {
+          alert('Preencha todos os campos!');
+          return;
+      }
+    } catch (erro) {
+      return;
     }
-    const newTrans = {
-        id: Date.now().toString(), // ID único
-        name: name,
-        value: value,
-        date: date,
-        type: type,
 
+    // Validação de Datas, se a data houve 4 caracteres o ano será o atual.
+    // console.log(date.length)
+    if (date.length <= 9) {
+      console.log("Entrei")
+      alert("Coloque a data completa")
+      return;
+    };
+
+
+    const newTrans = {
+      id: Date.now().toString(), // ID único
+      name: name,
+      value: value,
+      date: brParaISO(date),
+      type: String(type),
     };
 
     const valor = numValorBRL(value);
@@ -166,7 +143,6 @@ export default function Menu( {logar} ) {
       return Number.isFinite(novo) ? novo : prev; // não deixa virar NaN
     });
 
-
     setList(prev => [...prev, newTrans]);; // Adiciona ao array
     setName('');
     setDate('');
@@ -176,33 +152,62 @@ export default function Menu( {logar} ) {
     setPosicaoModal(false);
   };
 
-  // Remover usuário pelo ID
-  const removeUser = (id) => {
-    setList(list.filter(list => list.id !== id));
-  };
 
-  function maskDataDDMMYYYY(text) {
+  function maskDataDDMMYYYY(text) { // Verificar o formato e vai atualizando de acordo que o user escreve!
     const digits = text.replace(/\D/g, "").slice(0, 8); // só números, máx 8
 
-    const dia = digits.slice(0, 2);
-    const mes = digits.slice(2, 4);
-    const ano = digits.slice(4, 8);
+    const anoAtual = new Date().getFullYear()
+    
+    const diaStr = digits.slice(0, 2);
+    const mesStr = digits.slice(2, 4);
+    const anoStr = digits.slice(4, 8);
 
-    if (digits.length <= 2) return dia;
-    if (digits.length <= 4) return `${dia}/${mes}`;
-    return `${dia}/${mes}/${ano}`;
+    // Validação por completo
+    const dia = Number(digits.slice(0, 2));
+    const mes = Number(digits.slice(2, 4));
+    const ano = Number(digits.slice(4, 8));
+
+    if ( 1 > dia && dia > 31){ // Validação de Dia
+      setAprovadoCompraData(false)
+    } 
+    if (1 > mes && mes > 12){ // Validação de mês
+      setAprovadoCompraData(false)
+    }
+    if (ano != anoAtual) {
+      setAprovadoCompraData(false)
+    } 
+    // > Validação concluída!
+
+
+    // console.log(Date(`${dia}/${mes}/${ano}`))
+
+    if (digits.length <= 2) return diaStr;
+    if (digits.length <= 4) return `${diaStr}/${mesStr}`;
+    setAprovadoCompraData(true);
+    return `${diaStr}/${mesStr}/${anoStr}`
   }
 
-  function validarDDMMYYYY(texto) {
-    if (!/^\d{2}\/\d{2}\/\d{4}$/.test(texto)) return false;
+  function brParaISO(texto) {
+    // formato básico
+    if (!/^\d{2}\/\d{2}\/\d{4}$/.test(texto)) return null;
 
     const [dd, mm, yyyy] = texto.split("/").map(Number);
+
+    // cria data local (sem UTC)
     const d = new Date(yyyy, mm - 1, dd);
 
+    // verifica se existe
+    if (
+      d.getFullYear() !== yyyy ||
+      d.getMonth() !== mm - 1 ||
+      d.getDate() !== dd
+    ) return null;
+
+    // gera ISO manual (sem timezone)
     return (
-      d.getFullYear() === yyyy &&
-      d.getMonth() === mm - 1 &&
-      d.getDate() === dd
+      String(yyyy).padStart(4, "0") + "-" +
+      String(mm).padStart(2, "0") + "-" +
+      String(dd).padStart(2, "0")
     );
   }
 
@@ -302,7 +307,7 @@ export default function Menu( {logar} ) {
                 onValueChange={() => {
                   const novoValor = !agree;
                   setAgree(novoValor); (!agree) ?
-                  setDate(formatted) : setDate(false)
+                  setDate(formatted) : setDate("")
                 }}
                 color={agree ? "#4630EB" : undefined}
                 />

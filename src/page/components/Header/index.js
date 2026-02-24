@@ -58,17 +58,15 @@ export default function Header( {saldo, closeProfile} ) {
                 <Text style={{color: "#FFF", fontSize: 15, textAlign: "center"}}>
                     Saldo Picpay
                 </Text>
-                <View style={{flexDirection: "row", gap: 5, alignItems: "center"}}>
+                  <Pressable onPress={() => setVisivel(v => !v)} style={{flexDirection: "row", gap: 5, alignItems: "center"}} >
                     <Text style={{color: "#FFF", fontSize: 25, textAlign: "center"}}>
                         {visivel ? formatar(saldo) : <Text>R$ •••••</Text>}
                     </Text>
-                    <Pressable onPress={() => setVisivel(v => !v)} >
-                        <AntDesign name={visivel ? "eye" : "eye-invisible"} size={24} color="#FFF" />
-                    </Pressable>
-                </View>
-            </View>
-        </View>
-    </View>
+                    <AntDesign name={visivel ? "eye" : "eye-invisible"} size={24} color="#FFF" />
+                  </Pressable>
+              </View>
+          </View>
+      </View>
   );
 };
 
@@ -79,7 +77,6 @@ const styles = StyleSheet.create({
     height: 150,
     justifyContent: "flex-end",
     alignItems: "center",
-    
   },
 
   Contheader: {
