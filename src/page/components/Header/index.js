@@ -48,10 +48,14 @@ export default function Header( {saldo, closeProfile} ) {
   return (
     <View style={styles.container}>
         <View style={styles.Contheader}>
-            <Text style={styles.text}>Olá, {nome || "Luiz Henrique"}</Text>
             <Pressable onPress={() => closeProfile()}>
               <SimpleLineIcons name="user" size={24} color="#FFF" />
             </Pressable>
+            <TextInput 
+                style={styles.buscar}
+                placeholder='Buscar'
+            />
+            <Text style={styles.text}>Olá, {nome || "Luiz Henrique"}</Text>
         </View>
         <View style={styles.content}>
             <View style={styles.contentSaldo}>
@@ -93,6 +97,11 @@ const styles = StyleSheet.create({
     marginBottom: hp("4%"),
   },
 
+  buscar: {
+    color: "#FFF",
+    width: wp("25%")
+  },
+
   content: {
     flexDirection: "column",
     backgroundColor: "#177261",
@@ -100,6 +109,7 @@ const styles = StyleSheet.create({
     height: hp("17%"),
     padding: wp("5%"),
     borderRadius: 25,
+    marginBottom: hp("2%"),
   },
 
   contentSaldo: {
