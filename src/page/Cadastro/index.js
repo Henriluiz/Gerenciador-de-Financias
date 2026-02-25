@@ -7,6 +7,7 @@ import { useState } from 'react';
 
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Header from '../components/Header';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Cadastro() {
   const navigation = useNavigation();
@@ -16,13 +17,24 @@ export default function Cadastro() {
   const [senha, setSenha] = useState(null);
   const [aviso, setAviso] = useState(false);
     
+  const addLogin = async () => {
+    const user={
+      user: nome,
+      email: email,
+      password:senha,      
+    }
+
+    await AsyncStorage.setItem("@cadastro", JSON.stringify(user) )
+    console.log("Conta criada com sucesso")
+    navigation.navigate("Login");
+  }
 
   const validarCampos = () => {
       if (!nome || !email || !senha) {
           setAviso(true)
       return;
       } else {
-        navigation.navigate("Menu", { nome });
+        addLogin()        
       }
   };
 

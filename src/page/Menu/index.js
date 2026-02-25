@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Text, View, Pressable, Modal, Platform , TextInput, Alert, FlatList, TurboModuleRegistry} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import styles from './styles';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useState, useEffect } from 'react';
 
 import CheckBox from "expo-checkbox";
@@ -36,11 +36,8 @@ export default function Menu( {logar} ) {
   
   const [logan, setLogan] = useState(logar)
 
-  
 
-  function addItem() {
-    setList(prev => [...prev, `Item ${prev.length + 1}`]);
-  }
+
 
   const formatted = new Intl.DateTimeFormat('pt-BR', {
     day: '2-digit',
@@ -82,6 +79,39 @@ export default function Menu( {logar} ) {
     return Number.isFinite(n) ? n : 0; // nunca devolve NaN
   }
 
+  const verificarExtSaldo = async () => {
+    try {
+      const obj = await AsyncStorage.getItem("@transferencias");
+      const saldo_antigo = await AsyncStorage.getItem("@saldo")
+      if (obj !== null && saldo_antigo !== null) {
+        const valores = JSON.parse(obj)
+        const saldo_ant = JSON.parse(saldo_antigo)
+        return [valores, saldo_antigo]
+      }
+    } catch (error) {
+      console.log("Erro ao carregar", error);
+    }
+  };
+
+
+  const addItem = async () => {
+    const newTrans = {
+      id: Date.now().toString(), // ID único
+      name: name,
+      value: value,
+      date: brParaISO(date),
+      type: String(type),
+    };
+
+    prev = verificarExtSaldo()
+    const transferencias = [...prev, newTrans] 
+
+    await AsyncStorage.setItem("@transferencias", JSON.stringify(transferencias))
+    await AsyncStorage.setItem("@saldo", JSON.stringify(saldo))
+    console.log("Salvo com sucesso")
+
+  }
+
   // Adicionar novo usuário
   const addTrans = () => {
     if (!aprovadoCompra) {
@@ -103,7 +133,6 @@ export default function Menu( {logar} ) {
       alert("Coloque a data completa")
       return;
     };
-
 
     const newTrans = {
       id: Date.now().toString(), // ID único
@@ -128,6 +157,9 @@ export default function Menu( {logar} ) {
     setType('');
     setAgree(false);
     setPosicaoModal(false);
+
+    addItem()
+
   };
 
 
@@ -213,6 +245,11 @@ export default function Menu( {logar} ) {
     setList(prev => prev.slice(0, -1))
   };
 
+  useEffect(() => { 
+    const [saldo, extrato] = verificarExtSaldo();
+    setSaldo(saldo)
+    setList(extrato);
+  }, []);
 
   return (
     <View style={styles.container}>
