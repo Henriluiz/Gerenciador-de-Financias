@@ -5,6 +5,7 @@ import styles from './styles';
 import { useNavigation } from '@react-navigation/native';
 import { useState, useEffect } from 'react';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function Login() {

@@ -14,6 +14,7 @@ import AntDesign from '@expo/vector-icons/AntDesign'; // Visualizar saldo <AntDe
 // <AntDesign name="send" size={24} color="black" /> - Enviar 
 //<AntDesign name="setting" size={24} color="black" />
 // <AntDesign name="sun" size={24} color="black" /> modo claro
+import Feather from '@expo/vector-icons/Feather';
 
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import Cadastro from '../../Cadastro';
@@ -51,11 +52,14 @@ export default function Header( {saldo, closeProfile} ) {
             <Pressable onPress={() => closeProfile()}>
               <SimpleLineIcons name="user" size={24} color="#FFF" />
             </Pressable>
-            <TextInput 
-                style={styles.buscar}
-                placeholder='Buscar'
-            />
-            <Text style={styles.text}>Olá, {nome || "Luiz Henrique"}</Text>
+            <View style={styles.contentHeaderBsc}>  
+              <Feather name="search" size={24} color="#FFF"/>
+              <TextInput 
+                  style={styles.buscar}
+                  placeholder='Buscar'
+                  placeholderTextColor="#1B7F69">
+              </TextInput>
+            </View>
         </View>
         <View style={styles.content}>
             <View style={styles.contentSaldo}>
@@ -83,23 +87,34 @@ export default function Header( {saldo, closeProfile} ) {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#1F8F78",
-    paddingTop: statusBarHeight, // Isso fará o padding de acordo com o tamanho do StatusBar
+    paddingTop: statusBarHeight + 50, // Isso fará o padding de acordo com o tamanho do StatusBar
     justifyContent: "flex-end",
     alignItems: "center",
   },
 
   Contheader: {
     width: wp("90%"),
+    gap: 15,
     backgroundColor: "#1F8F78",
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
     marginBottom: hp("4%"),
   },
 
+  contentHeaderBsc: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#41AD95",
+    gap: 5,
+    paddingLeft: 5,
+    borderRadius: 20,
+  },
+
   buscar: {
+    backgroundColor: "#41AD95",
+    width: wp("35%"),
     color: "#FFF",
-    width: wp("25%")
+    borderRadius: 20,
   },
 
   content: {

@@ -36,29 +36,7 @@ export default function Menu( {logar} ) {
   
   const [logan, setLogan] = useState(logar)
 
-  const KEY_LIST = "@transacoes";
-  const KEY_SALDO = "@saldo";
-
-  async function salvarTudo(list, saldo) {
-    await AsyncStorage.multiSet([
-      [KEY_LIST, JSON.stringify(list)],
-      [KEY_SALDO, JSON.stringify(saldo)],
-    ]);
-    console.log("Todo salvo!")
-  }
-
-  async function carregarTudo(setList, setSaldo) {
-    const items = await AsyncStorage.multiGet([KEY_LIST, KEY_SALDO]);
-    const map = Object.fromEntries(items);
-
-    const lista_atl = map[KEY_LIST] ? JSON.parse(map[KEY_LIST]) : [];
-    const saldo_atl = map[KEY_SALDO] ? JSON.parse(map[KEY_SALDO]) : 0;
-
-    setList(lista_atl);
-    setSaldo(saldo_atl);
-
-    console.log(list, saldo)
-  }
+  
 
   function addItem() {
     setList(prev => [...prev, `Item ${prev.length + 1}`]);
@@ -235,13 +213,6 @@ export default function Menu( {logar} ) {
     setList(prev => prev.slice(0, -1))
   };
 
-  useEffect(() => {
-    carregarTudo(setList, setSaldo);
-  }, []);
-
-  useEffect(() => {
-    salvarTudo(list, saldo);
-  }, [list, saldo]);
 
   return (
     <View style={styles.container}>
@@ -255,7 +226,6 @@ export default function Menu( {logar} ) {
           onOpenModalGanho={() => (setPosicaoModal(true), setCompra(false), setType(1))}
           onClearList = {() => (setList([]), setSaldo(0))}
           onClearUltList = {() => delUltTrans()}
-          reloadUp = {() => carregarTudo()}
         />
         <Modal transparent={true} visible={posicaoModal}>
           <KeyboardAwareScrollView
