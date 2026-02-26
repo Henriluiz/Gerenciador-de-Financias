@@ -17,6 +17,8 @@ import AntDesign from '@expo/vector-icons/AntDesign'; // Visualizar saldo <AntDe
 import Feather from '@expo/vector-icons/Feather';
 
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import Cadastro from '../../Cadastro';
 //  User 
 
@@ -49,9 +51,11 @@ export default function Header( {saldo, closeProfile} ) {
   return (
     <View style={styles.container}>
         <View style={styles.Contheader}>
-            <Pressable onPress={() => closeProfile()}>
-              <SimpleLineIcons name="user" size={24} color="#FFF" />
-            </Pressable>
+            <View>
+              <Pressable onPress={() => closeProfile()}>
+                <SimpleLineIcons name="user" size={24} color="#FFF" />
+              </Pressable>
+            </View>
             <View style={styles.contentHeaderBsc}>  
               <Feather name="search" size={24} color="#FFF"/>
               <TextInput 
@@ -60,6 +64,15 @@ export default function Header( {saldo, closeProfile} ) {
                   placeholderTextColor="#1B7F69">
               </TextInput>
             </View>
+            <View style={[styles.contentHeaderBsc, {padding: 5}]}>
+              <MaterialIcons name="help-outline" size={24} color="#FFF" />
+            </View>
+            <View style={[styles.contentHeaderBsc, {padding: 5}]}>
+              <MaterialIcons name="contact-support" size={24} color="#FFF" />
+            </View>
+            <View style={[styles.contentHeaderBsc, {padding: 5}]}>
+              <Ionicons name="notifications-outline" size={24} color="#FFF" />
+            </View>
         </View>
         <View style={styles.content}>
             <View style={styles.contentSaldo}>
@@ -67,13 +80,15 @@ export default function Header( {saldo, closeProfile} ) {
                   <Text style={{color: "#FFF", fontSize: 18}}>
                     Saldo em conta
                   </Text>
-                    <Pressable onPress={() => setVisivel(v => !v)} style={{flexDirection: "row", gap: 5, alignItems: "center"}} >
-                      <Text style={{color: "#FFF", fontSize: 25, textAlign: "center", fontWeight: "bold"}}>
-                          {visivel ? formatar(saldo) : <Text>R$ •••••</Text>}
-                      </Text>
-                    </Pressable>
+                  <View style={{flexDirection: "row", gap: 5, alignItems: "center"}}>
+                    <Text style={{color: "#FFF", fontSize: 25, textAlign: "center", fontWeight: "bold"}}>
+                        {visivel ? formatar(saldo) : <Text>R$ •••••</Text>}
+                    </Text>    
+                  </View>
               </View>
-              <AntDesign name={visivel ? "eye-invisible" : "eye"} size={24} color="#FFF" />
+              <Pressable onPress={() => setVisivel(v => !v)} style={{paddingTop: hp("2%")}}>
+                <AntDesign name={visivel ? "eye-invisible" : "eye"} size={24} color="#FFF" />
+              </Pressable>
             </View>
             <Pressable
               style={styles.botton}> 
@@ -87,18 +102,18 @@ export default function Header( {saldo, closeProfile} ) {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#1F8F78",
-    paddingTop: statusBarHeight + 50, // Isso fará o padding de acordo com o tamanho do StatusBar
+    paddingTop: statusBarHeight + 24, // Isso fará o padding de acordo com o tamanho do StatusBar
     justifyContent: "flex-end",
     alignItems: "center",
   },
 
   Contheader: {
     width: wp("90%"),
-    gap: 15,
+    gap: wp("2%"),
     backgroundColor: "#1F8F78",
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: hp("4%"),
+    marginBottom: hp("2%"),
   },
 
   contentHeaderBsc: {
@@ -121,7 +136,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     backgroundColor: "#177261",
     width: wp("80%"),
-    height: hp("17%"),
+    height: hp("20%"),
     padding: wp("5%"),
     borderRadius: 25,
     marginBottom: hp("2%"),
@@ -135,7 +150,7 @@ const styles = StyleSheet.create({
 
   itens: {
     paddingTop: 5,
-    paddingBottom: 20,
+    paddingBottom: 10,
   },
 
   botton: {

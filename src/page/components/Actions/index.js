@@ -19,14 +19,14 @@ export default function Actions({ onOpenModalCompra, onOpenModalGanho,
     <ScrollView style={styles.container} horizontal={true} showsHorizontalScrollIndicator={false}>
         <Pressable style={styles.actionButton} onPress={() => onOpenModalGanho()}>
             <View style={styles.areaButton}>
-                <FontAwesome6 name="add" size={24} color="black" />
+                <MaterialIcons name="pix" size={24} color="black" />
             </View>
-            <Text style={styles.labelButton}>Entradas</Text>
+            <Text style={styles.labelButton}>Receber</Text>
         </Pressable>
 
         <Pressable style={styles.actionButton} onPress={() => onOpenModalCompra()}>
             <View style={styles.areaButton}>
-                <AntDesign name="tag" size={24} color="black"/>
+                <AntDesign name="shopping-cart" size={24} color="black" />
             </View>
             <Text style={styles.labelButton}>Compras</Text>
         </Pressable>
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ecf0f1",
     width: wp("15%"),
     height: hp("7,5%"),
-    borderRadius: 30,
+    borderRadius: 15,
     justifyContent: "center",
     alignItems: "center",
   },
