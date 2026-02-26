@@ -7,6 +7,8 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 // <MaterialIcons name="attach-money" size={24} color="black" /> ganhei money
 // <MaterialIcons name="money-off" size={24} color="black" /> Perdi money
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 export default function Movements({ data }) {
     const [showValue, setShowValue] = useState(false);

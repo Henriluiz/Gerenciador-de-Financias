@@ -5,6 +5,7 @@ import styles from './styles';
 import { useNavigation } from '@react-navigation/native';
 import { useState, useEffect } from 'react';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function Login() {
@@ -18,14 +19,35 @@ export default function Login() {
       if (!email || !senha) {
           setAviso(true)
       return;
-      } else if (email != "luiz" || senha != "2145"){
-        setAviso(true)
-        return;
       } else {
-          const logado = true
-          navigation.navigate('Menu', {logado})
+        verificarLogin()
       }
   };
+
+  const addObj = async () => {
+    const login={
+      email: email,
+      password: senha
+    }
+    await AsyncStorage.setItem("@login", JSON.stringify(login) )
+    console.log("Salvo com sucesso")
+    navigation.replace("Menu")
+  }
+
+  const verificarLogin = async () => {
+    try {
+      const obj = await AsyncStorage.getItem("@cadastro");
+      if (obj !== null) {
+        const pessoa = JSON.parse(obj)
+        if (email == pessoa.email && senha == pessoa.password) {
+          addObj()
+        }
+      }
+    } catch (error) {
+      console.log("Login/verificarLogin - Erro ao carregar", error);
+    }
+  };
+  
 
   return (
     <KeyboardAwareScrollView

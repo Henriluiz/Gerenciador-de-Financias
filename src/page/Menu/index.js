@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Text, View, Pressable, Modal, Platform , TextInput, Alert, FlatList, TurboModuleRegistry} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import styles from './styles';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useState, useEffect } from 'react';
 
 import CheckBox from "expo-checkbox";
@@ -36,33 +36,8 @@ export default function Menu( {logar} ) {
   
   const [logan, setLogan] = useState(logar)
 
-  const KEY_LIST = "@transacoes";
-  const KEY_SALDO = "@saldo";
 
-  async function salvarTudo(list, saldo) {
-    await AsyncStorage.multiSet([
-      [KEY_LIST, JSON.stringify(list)],
-      [KEY_SALDO, JSON.stringify(saldo)],
-    ]);
-    console.log("Todo salvo!")
-  }
 
-  async function carregarTudo(setList, setSaldo) {
-    const items = await AsyncStorage.multiGet([KEY_LIST, KEY_SALDO]);
-    const map = Object.fromEntries(items);
-
-    const lista_atl = map[KEY_LIST] ? JSON.parse(map[KEY_LIST]) : [];
-    const saldo_atl = map[KEY_SALDO] ? JSON.parse(map[KEY_SALDO]) : 0;
-
-    setList(lista_atl);
-    setSaldo(saldo_atl);
-
-    console.log(list, saldo)
-  }
-
-  function addItem() {
-    setList(prev => [...prev, `Item ${prev.length + 1}`]);
-  }
 
   const formatted = new Intl.DateTimeFormat('pt-BR', {
     day: '2-digit',
@@ -104,6 +79,39 @@ export default function Menu( {logar} ) {
     return Number.isFinite(n) ? n : 0; // nunca devolve NaN
   }
 
+  const verificarExtSaldo = async () => {
+    try {
+      const obj = await AsyncStorage.getItem("@transferencias");
+      const saldo_antigo = await AsyncStorage.getItem("@saldo")
+      if (obj !== null && saldo_antigo !== null) {
+        const valores = JSON.parse(obj)
+        const saldo_ant = JSON.parse(saldo_antigo)
+        return [valores, saldo_antigo]
+      }
+    } catch (error) {
+      console.log("Erro ao carregar", error);
+    }
+  };
+
+
+  const addItem = async () => {
+    const newTrans = {
+      id: Date.now().toString(), // ID único
+      name: name,
+      value: value,
+      date: brParaISO(date),
+      type: String(type),
+    };
+
+    prev = verificarExtSaldo()
+    const transferencias = [...prev, newTrans] 
+
+    await AsyncStorage.setItem("@transferencias", JSON.stringify(transferencias))
+    await AsyncStorage.setItem("@saldo", JSON.stringify(saldo))
+    console.log("Salvo com sucesso")
+
+  }
+
   // Adicionar novo usuário
   const addTrans = () => {
     if (!aprovadoCompra) {
@@ -125,7 +133,6 @@ export default function Menu( {logar} ) {
       alert("Coloque a data completa")
       return;
     };
-
 
     const newTrans = {
       id: Date.now().toString(), // ID único
@@ -150,6 +157,9 @@ export default function Menu( {logar} ) {
     setType('');
     setAgree(false);
     setPosicaoModal(false);
+
+    addItem()
+
   };
 
 
@@ -235,13 +245,11 @@ export default function Menu( {logar} ) {
     setList(prev => prev.slice(0, -1))
   };
 
-  useEffect(() => {
-    carregarTudo(setList, setSaldo);
+  useEffect(() => { 
+    const [saldo, extrato] = verificarExtSaldo();
+    setSaldo(saldo)
+    setList(extrato);
   }, []);
-
-  useEffect(() => {
-    salvarTudo(list, saldo);
-  }, [list, saldo]);
 
   return (
     <View style={styles.container}>
@@ -255,7 +263,6 @@ export default function Menu( {logar} ) {
           onOpenModalGanho={() => (setPosicaoModal(true), setCompra(false), setType(1))}
           onClearList = {() => (setList([]), setSaldo(0))}
           onClearUltList = {() => delUltTrans()}
-          reloadUp = {() => carregarTudo()}
         />
         <Modal transparent={true} visible={posicaoModal}>
           <KeyboardAwareScrollView
