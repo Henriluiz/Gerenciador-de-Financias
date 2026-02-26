@@ -15,6 +15,8 @@ import Actions from '../components/Actions';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { ActivityIndicator } from 'react-native-web';
+import { BackHandler } from "react-native";
+
 // <MaterialIcons name="attach-money" size={24} color="black" /> ganhei money
 // <MaterialIcons name="money-off" size={24} color="black" /> Perdi money
 
@@ -86,7 +88,10 @@ export default function Menu( {logar} ) {
       if (obj !== null && saldo_antigo !== null) {
         const valores = JSON.parse(obj)
         const saldo_ant = JSON.parse(saldo_antigo)
-        return [valores, saldo_antigo]
+        return {valores, saldo_ant}
+      } else 
+      {
+        return {valores: [],saldo_ant: 0 }
       }
     } catch (error) {
       console.log("Erro ao carregar", error);
@@ -94,26 +99,22 @@ export default function Menu( {logar} ) {
   };
 
 
-  const addItem = async () => {
-    const newTrans = {
-      id: Date.now().toString(), // ID único
-      name: name,
-      value: value,
-      date: brParaISO(date),
-      type: String(type),
-    };
+  const addItem = async (newTrans, delta) => {
+    const prev = await verificarExtSaldo();
 
-    prev = verificarExtSaldo()
-    const transferencias = [...prev, newTrans] 
+    const transferencias = [...(prev?.valores ?? []), newTrans];
+    transferencias.sort((a, b) => new Date(b.date) - new Date(a.date)); // ordenando a lista pela data, recente primeiro
 
-    await AsyncStorage.setItem("@transferencias", JSON.stringify(transferencias))
-    await AsyncStorage.setItem("@saldo", JSON.stringify(saldo))
-    console.log("Salvo com sucesso")
+    const saldo_att = (prev?.saldo_ant ?? 0) + delta; // delta foi a diferença entre o último valor
 
-  }
+    await AsyncStorage.setItem("@transferencias", JSON.stringify(transferencias));
+    await AsyncStorage.setItem("@saldo", JSON.stringify(saldo_att));
+
+    console.log("Salvo com sucesso");
+  };
 
   // Adicionar novo usuário
-  const addTrans = () => {
+  const addTrans = async() => {
     if (!aprovadoCompra) {
       return;
     }
@@ -133,7 +134,12 @@ export default function Menu( {logar} ) {
       alert("Coloque a data completa")
       return;
     };
+    
+    const valor = numValorBRL(value);
+    const t = Number(type); // garante número
 
+    const delta = t === 0 ? -valor : +valor; // ✅ compra sai, ganho entra
+    
     const newTrans = {
       id: Date.now().toString(), // ID único
       name: name,
@@ -142,24 +148,24 @@ export default function Menu( {logar} ) {
       type: String(type),
     };
 
-    const valor = numValorBRL(value);
-    const t = Number(type); // garante número
+    setSaldo(prev => prev + delta);
+    setList(prev => {
+      const nova = [...prev, newTrans];
 
-    setSaldo(prev => {
-      const novo = t == 0 ? prev - valor : prev + valor;
-      return Number.isFinite(novo) ? novo : prev; // não deixa virar NaN
-    });
+      return nova.sort((a, b) =>
+        new Date(b.date) - new Date(a.date)
+      );
+    }); // Isso, muda o array por completo, assim o flatlist vai detectar e reiniciar
+    // e ordena!q
 
-    setList(prev => [...prev, newTrans]);; // Adiciona ao array
-    setName('');
-    setDate('');
-    setValue('');
-    setType('');
+    setName("");
+    setDate("");
+    setValue("");
+    setType("");
     setAgree(false);
     setPosicaoModal(false);
 
-    addItem()
-
+    await addItem(newTrans, delta); 
   };
 
 
@@ -195,7 +201,7 @@ export default function Menu( {logar} ) {
     if (digits.length <= 4) return `${diaStr}/${mesStr}`;
     setAprovadoCompraData(true);
     return `${diaStr}/${mesStr}/${anoStr}`
-  }
+  };
 
   function brParaISO(texto) {
     // formato básico
@@ -219,7 +225,7 @@ export default function Menu( {logar} ) {
       String(mm).padStart(2, "0") + "-" +
       String(dd).padStart(2, "0")
     );
-  }
+  };
 
   function fecharModal() {
     setPosicaoModal(false)
@@ -245,17 +251,29 @@ export default function Menu( {logar} ) {
     setList(prev => prev.slice(0, -1))
   };
 
-  useEffect(() => { 
-    const [saldo, extrato] = verificarExtSaldo();
-    setSaldo(saldo)
-    setList(extrato);
+  useEffect(() => {
+  const carregar = async () => {
+    const antigoStatus = await verificarExtSaldo();
+
+    if (!antigoStatus) return;
+
+    if (
+      antigoStatus.valores?.length > 0 ||
+      antigoStatus.saldo_ant !== saldo
+    ) {
+      setList(antigoStatus.valores);
+      setSaldo(antigoStatus.saldo_ant);
+    }
+  };
+
+  carregar();
   }, []);
 
   return (
     <View style={styles.container}>
       <Header 
         saldo={saldo}
-        closeProfile = {() => (salvarTudo(list, saldo), navigation.replace("Login"))}
+        closeProfile = {() => (addItem(), BackHandler.exitApp())}
       />
       <View style={{paddingInline: 10}}>
         <Actions 
